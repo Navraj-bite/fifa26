@@ -2,14 +2,16 @@
 Monte Carlo forward simulation of the rest of the 2026 World Cup, using the
 trained model's win probabilities and the confirmed bracket tree.
 
-Bracket confirmed via live web search on 2026-07-07 (cross-checked across
-ESPN, Fox Sports, Olympics.com, Al Jazeera):
+Bracket confirmed via live web search, cross-checked across ESPN, Fox Sports,
+Olympics.com, Al Jazeera, and CNN. All of the Round of 16 finished on 2026-07-07
+(Switzerland beat Colombia 4-3 on penalties after a 0-0 draw; Argentina beat
+Egypt 3-2). The four quarterfinals below are confirmed matchups, still
+unplayed as of this run:
 
   QF1 (Boston,  Jul 9):  France     vs Morocco
   QF2 (LA,      Jul 10): Spain      vs Belgium
   QF3 (Miami,   Jul 11): England    vs Norway
-  QF4 (KC,      Jul 11/12): Winner(Argentina v Egypt) vs Winner(Switzerland v Colombia)
-                             [both Round of 16 matches unplayed as of this run -- July 7]
+  QF4 (KC,      Jul 11/12): Argentina vs Switzerland
 
   SF1 (Dallas,   Jul 14): Winner QF1 vs Winner QF2
   SF2 (Atlanta,  Jul 15): Winner QF3 vs Winner QF4
@@ -37,14 +39,11 @@ from load_data import load_results, played_mask as pm
 N_SIMULATIONS = 20000
 RNG_SEED = 42
 
-# Round of 16 matches still to be played as of this run (2026-07-07)
-PENDING_R16 = [("Argentina", "Egypt"), ("Switzerland", "Colombia")]
-
 QUARTERFINALS = [
     ("France", "Morocco"),
     ("Spain", "Belgium"),
     ("England", "Norway"),
-    # 4th QF slot filled in dynamically once the two pending R16 games resolve
+    ("Argentina", "Switzerland"),
 ]
 
 
@@ -83,16 +82,11 @@ def build_matchup_probabilities(teams, elo, form, model):
     return probs
 
 
-def simulate_bracket(rng, probs, pending_r16, quarterfinals):
+def simulate_bracket(rng, probs, quarterfinals):
     def play(a, b):
         return a if rng.random() < probs[(a, b)] else b
 
-    # Resolve the two pending Round of 16 matches
-    r16_winners = [play(a, b) for a, b in pending_r16]
-    qf4 = (r16_winners[0], r16_winners[1])
-
-    all_qf = quarterfinals + [qf4]
-    qf_winners = [play(a, b) for a, b in all_qf]
+    qf_winners = [play(a, b) for a, b in quarterfinals]
 
     sf1 = (qf_winners[0], qf_winners[1])
     sf2 = (qf_winners[2], qf_winners[3])
@@ -100,7 +94,6 @@ def simulate_bracket(rng, probs, pending_r16, quarterfinals):
 
     champion = play(*sf_winners)
     return {
-        "qf4_opponent": qf4,
         "semifinalists": qf_winners,   # reached the semifinal (won their QF)
         "finalists": sf_winners,       # reached the final (won their SF)
         "champion": champion,
@@ -119,19 +112,13 @@ def main():
     xgb = models["xgb"]
 
     teams_in_play = set()
-    for a, b in PENDING_R16 + QUARTERFINALS:
+    for a, b in QUARTERFINALS:
         teams_in_play.add(a)
         teams_in_play.add(b)
-    # QF4 participants are unknown in advance (winners of pending R16), so include
-    # every team that could reach the quarterfinal/semifinal/final stage.
     remaining_teams = list(teams_in_play)
 
-    print("Win probability for today's still-live Round of 16 matches:")
+    print("Win probability for the confirmed quarterfinals:")
     probs = build_matchup_probabilities(remaining_teams, elo, form, xgb)
-    for a, b in PENDING_R16:
-        print(f"  {a:12s} vs {b:12s}  ->  {a}: {probs[(a,b)]:.1%}   {b}: {probs[(b,a)]:.1%}")
-
-    print("\nWin probability for confirmed quarterfinals:")
     for a, b in QUARTERFINALS:
         print(f"  {a:12s} vs {b:12s}  ->  {a}: {probs[(a,b)]:.1%}   {b}: {probs[(b,a)]:.1%}")
 
@@ -141,7 +128,7 @@ def main():
     semifinalist_counts = defaultdict(int)
 
     for _ in range(N_SIMULATIONS):
-        sim = simulate_bracket(rng, probs, PENDING_R16, QUARTERFINALS)
+        sim = simulate_bracket(rng, probs, QUARTERFINALS)
         champion_counts[sim["champion"]] += 1
         for t in sim["finalists"]:
             finalist_counts[t] += 1
@@ -167,7 +154,6 @@ def main():
         json.dump({
             "n_simulations": N_SIMULATIONS,
             "rng_seed": RNG_SEED,
-            "pending_r16": PENDING_R16,
             "confirmed_quarterfinals": QUARTERFINALS,
         }, f, indent=2)
     print("\nSaved: results/championship_probabilities.csv, results/simulation_meta.json")

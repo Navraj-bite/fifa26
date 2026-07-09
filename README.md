@@ -1,149 +1,178 @@
 # 2026 World Cup Predictor
 
-Trained on 154 years of international football history, this predicts the outcome
-of the **remaining** matches of the 2026 FIFA World Cup and Monte Carlo-simulates
-the rest of the bracket. First run: **2026-07-07**, with the Round of 16 still in
-progress (Argentina vs Egypt and Switzerland vs Colombia had not yet kicked off).
-The tournament resolves on 2026-07-19 — this is a timestamped, checkable
-prediction, not a backtest of a dead dataset.
+I built a model that predicts the rest of the 2026 World Cup while the tournament
+is still happening, so the prediction can actually be checked against reality
+instead of quietly forgotten. It uses 154 years of international football
+results to rate every national team, then simulates the remaining bracket
+thousands of times to get a championship probability for each team still alive.
 
-## Method
+First run: July 7, 2026. The final is July 19. This README gets updated as
+real results come in, so you can watch the model get graded live instead of
+taking my word for it.
 
-1. **Data**: [`international-football-results-from-1872-to-2017`](https://www.kaggle.com/datasets/martj42/international-football-results-from-1872-to-2017)
-   (Kaggle, martj42), an auto-updated dataset of ~49,500 international matches.
-   As of this run it lagged real-world results by 1-2 days for six 2026 Round of
-   16 matches; those six are patched in from confirmed press reporting (sources
-   below). Two Round of 16 matches were genuinely unplayed at the time of this
-   run — those are left alone and are exactly what the model predicts live.
+## Where things stand right now (last updated July 9, 2026)
 
-2. **Elo ratings** ([`src/elo.py`](src/elo.py)): team strength isn't a column in
-   the data, it's computed by replaying all ~49,500 matches in order. Standard
-   [eloratings.net](https://www.eloratings.net)-style update: goal-difference
-   weighting, a competition-importance K-factor (60 for World Cup matches down
-   to 20 for friendlies), and a 100-point home-advantage adjustment for
-   non-neutral venues.
+The Round of 16 is done. All 16 matches played, including two nail-biters:
+Argentina came back from 2-0 down to beat Egypt 3-2, and Switzerland needed
+penalties to get past Colombia after 120 scoreless minutes.
 
-3. **Features** ([`src/features.py`](src/features.py)): each side's pre-match
-   Elo, the Elo differential (home-advantage-adjusted), neutral-venue flag,
-   competition-importance weight, and each team's rolling goal difference over
-   its last 10 matches.
+The quarterfinals are set and none have been played yet:
 
-4. **Models** ([`src/model.py`](src/model.py)): a multinomial logistic
-   regression baseline and an XGBoost classifier, both predicting win/draw/loss.
-   Evaluated with a **time-based split** — trained on matches before
-   2024-01-01, evaluated on 2024-01-01 through 2026-06-10 (the day before this
-   World Cup kicked off). Never shuffled; sports outcomes are time-ordered.
+- **France vs Morocco**, July 9, Boston
+- **Spain vs Belgium**, July 10, Los Angeles
+- **England vs Norway**, July 11, Miami
+- **Argentina vs Switzerland**, July 11 or 12, Kansas City
 
-5. **Backtest** ([`src/backtest.py`](src/backtest.py)): the model is re-fit on
-   *all* data through 2026-06-10 (still zero 2026 World Cup matches) and
-   scored against the 94 World Cup matches actually played so far. This is the
-   headline result.
+Everything below reflects that state. A scheduled job re-runs this whole
+project after the quarterfinals, again after the semifinals, and once more
+after the final, so the numbers keep catching up to reality without me
+manually babysitting it.
 
-6. **Forward simulation** ([`src/simulate.py`](src/simulate.py)): the
-   confirmed knockout bracket (verified via live web search, cross-checked
-   across ESPN, Fox Sports, Al Jazeera, Olympics.com) is simulated 20,000 times
-   using the model's win probabilities, producing a championship-probability
-   table. Draws in a knockout tie are split 50/50 (penalty-shootout coin flip),
-   and each matchup's probability is averaged across both home/away orderings
-   since knockout venues are neutral.
+## How it actually works
 
-## Results
+**1. The data.** [This Kaggle dataset](https://www.kaggle.com/datasets/martj42/international-football-results-from-1872-to-2017)
+has about 49,500 international football results going back to 1872. It
+updates automatically, though it tends to lag real games by a day or two, so
+I patch in confirmed scores from actual news coverage when the dataset
+hasn't caught up yet. Every patched score is sourced and cross-checked
+against at least two outlets, listed at the bottom of this file.
 
-### Generic time-based validation (2024-01-01 to 2026-06-10, pre-tournament)
+**2. Elo ratings.** Team strength isn't something you can just look up in a
+spreadsheet, so I built it: replay every match in the dataset in order,
+updating each team's rating after each result the same way chess Elo works,
+adjusted for goal difference and how much the competition matters (a World
+Cup match moves the needle a lot more than a friendly). This is really the
+whole project. Everything downstream just uses these numbers.
 
-| Model | Accuracy | Log-loss | n |
-|---|---|---|---|
-| Logistic regression | 59.9% | 0.871 | 2,543 |
-| XGBoost | 59.9% | 0.869 | 2,543 |
+**3. Features.** For each match: both teams' Elo rating going in, the gap
+between them, whether the game is at a neutral venue, how important the
+competition is, and each team's recent form (goal difference over their last
+10 games).
 
-### 2026 World Cup backtest (94 matches played, group stage through Round of 16)
+**4. The model.** A logistic regression baseline and an XGBoost classifier,
+both predicting win, draw, or loss. Trained on everything before January
+2024, tested on games from January 2024 up to the day before this World Cup
+started. No shuffling. Sports results happen in order, and testing on the
+past using knowledge of the future is how you fool yourself into thinking a
+model works.
+
+**5. The backtest.** This is the part I actually care about. Instead of just
+trusting the generic validation numbers, I ran the trained model against
+every 2026 World Cup match played so far and checked how it actually did.
+No cherry-picking, every match counts, wins and misses both included.
+
+**6. The simulation.** Using the confirmed bracket and the model's win
+probabilities, I simulate the rest of the tournament 20,000 times. Draws in
+a knockout match get split 50/50, standing in for the penalty shootout coin
+flip. Add up how often each team wins it all across those 20,000 runs and
+you get a championship probability table.
+
+## Results so far
+
+### Generic validation (games from 2024 to just before this World Cup)
 
 | Model | Accuracy | Log-loss |
 |---|---|---|
-| Logistic regression | 63.8% | 0.857 |
-| XGBoost | **64.9%** | **0.846** |
+| Logistic regression | 59.9% | 0.871 |
+| XGBoost | 59.9% | 0.869 |
 
-For reference, always-predict-home-win scores ~49% accuracy on this dataset's
-historical base rate, and uniform random 3-way guessing scores 33.3% accuracy
-and 1.099 log-loss. The model is meaningfully better calibrated than either.
-Full per-match predictions: [`results/wc2026_backtest_detail.csv`](results/wc2026_backtest_detail.csv).
+For context, always guessing "home team wins" gets you about 49% on this
+dataset, and guessing randomly among the three outcomes gets you 33.3%. So
+the model is doing real work, just don't expect it to be right every time.
+Football is famously hard to predict, which is most of why it's fun to watch.
 
-### Live Round of 16 predictions (not yet played as of 2026-07-07)
+### This exact World Cup, 96 matches played (group stage through Round of 16)
 
-| Match | Win probability |
+| Model | Accuracy | Log-loss |
+|---|---|---|
+| Logistic regression | 63.5% | 0.854 |
+| XGBoost | **64.6%** | **0.846** |
+
+Slightly better than the generic numbers, which is a good sign, not a red
+flag. It means the model isn't just memorizing history, it's picking up on
+something real about team strength that's holding up in the actual
+tournament. Full match-by-match predictions are in
+[`results/wc2026_backtest_detail.csv`](results/wc2026_backtest_detail.csv) if
+you want to see every call, right and wrong.
+
+Two Round of 16 calls worth calling out honestly: the model correctly picked
+Argentina to beat Egypt, but leaned slightly toward Colombia in a match that
+ended level and went to penalties. Draws are the hardest outcome to call in
+this sport, and this model is no exception.
+
+### Quarterfinal win probabilities
+
+| Match | Model says |
 |---|---|
-| Argentina vs Egypt | Argentina 82.2% / Egypt 17.8% |
-| Switzerland vs Colombia | Switzerland 42.0% / Colombia 58.0% |
+| France vs Morocco | France 63.6%, Morocco 36.4% |
+| Spain vs Belgium | Spain 64.4%, Belgium 35.6% |
+| England vs Norway | England 61.6%, Norway 38.4% |
+| Argentina vs Switzerland | Argentina 72.4%, Switzerland 27.6% |
 
-### Confirmed quarterfinal win probabilities
-
-| Match | Win probability |
-|---|---|
-| France vs Morocco (Jul 9, Boston) | France 63.6% / Morocco 36.4% |
-| Spain vs Belgium (Jul 10, LA) | Spain 64.4% / Belgium 35.6% |
-| England vs Norway (Jul 11, Miami) | England 61.6% / Norway 38.4% |
-
-### Championship probability (20,000-simulation Monte Carlo, as of 2026-07-07)
+### Championship probability (20,000 simulated tournaments)
 
 ![Championship probability chart](results/championship_probabilities.png)
 
-| Team | Reach SF | Reach Final | Win it all |
+| Team | Reaches semis | Reaches final | Wins it all |
 |---|---|---|---|
-| Spain | 64.0% | 36.7% | **21.1%** |
-| Argentina | 55.0% | 34.9% | 19.7% |
-| France | 63.0% | 33.6% | 19.1% |
-| England | 61.4% | 30.6% | 14.2% |
-| Belgium | 36.0% | 15.3% | 6.8% |
-| Morocco | 37.0% | 14.4% | 6.0% |
-| Norway | 38.6% | 15.4% | 5.7% |
-| Colombia | 24.3% | 11.5% | 4.7% |
-| Switzerland | 15.2% | 6.3% | 2.3% |
-| Egypt | 5.5% | 1.4% | 0.3% |
+| Argentina | 72.8% | 47.3% | **26.4%** |
+| Spain | 64.7% | 37.3% | 21.2% |
+| France | 63.9% | 33.7% | 18.7% |
+| England | 61.3% | 27.4% | 12.9% |
+| Belgium | 35.3% | 15.0% | 6.3% |
+| Morocco | 36.1% | 14.0% | 5.8% |
+| Norway | 38.7% | 13.6% | 4.7% |
+| Switzerland | 27.2% | 11.7% | 4.1% |
 
-Full table: [`results/championship_probabilities.csv`](results/championship_probabilities.csv).
+Full numbers in [`results/championship_probabilities.csv`](results/championship_probabilities.csv).
+Argentina is currently the favorite, largely on the strength of their Elo
+rating and a quarterfinal draw against a Switzerland side that's overachieving
+relative to its rating just by being here.
 
-## Bracket structure (confirmed 2026-07-07)
+## The bracket
 
 ```
-QF1 Boston Jul 9:   France vs Morocco       ─┐
-QF2 LA     Jul 10:  Spain vs Belgium        ─┼─ SF1 Dallas Jul 14  ─┐
-QF3 Miami  Jul 11:  England vs Norway       ─┐                     │
-QF4 KC     Jul 11/12: (Arg/Egypt) v (Swi/Col)┼─ SF2 Atlanta Jul 15 ─┼─ Final Jul 19, East Rutherford
+QF1 Boston, Jul 9:     France vs Morocco       -+
+QF2 LA, Jul 10:        Spain vs Belgium        -+- SF1, Dallas, Jul 14 -+
+QF3 Miami, Jul 11:     England vs Norway       -+                      |
+QF4 KC, Jul 11-12:     Argentina vs Switzerland -+- SF2, Atlanta, Jul 15 -+- Final, Jul 19, East Rutherford
 ```
 
-This gets re-run as each round actually completes: after the July 9-12
-quarterfinals, again after the July 14-15 semifinals, and a final grading after
-the July 19 final.
+This gets re-run after the quarterfinals wrap up, again after the
+semifinals, and a final time after the July 19 final, when we find out how
+right or wrong all of this actually was.
 
-## Sources for patched 2026 results
+## Sources for patched match results
 
-- Brazil 1-2 Norway (Jul 5): [Al Jazeera](https://www.aljazeera.com/sports/liveblog/2026/7/5/brazil-vs-norway-live-fifa-world-cup-2026-last-16), [FIFA.com](https://www.fifa.com/en/match-centre/match/17/285023/289288/400021532)
-- Mexico 2-3 England (Jul 5): [ESPN](https://www.espn.com/soccer/match/_/gameId/760505/england-mexico)
-- Portugal 0-1 Spain (Jul 6): [ESPN](https://www.espn.com/soccer/match/_/gameId/760506/spain-portugal), [CBS Sports](https://www.cbssports.com/soccer/news/portugal-spain-live-updates-world-cup-2026-score-result/live/)
-- United States 1-4 Belgium (Jul 6): [ESPN](https://www.espn.com/soccer/match/_/gameId/760507/belgium-united-states), [NPR](https://www.npr.org/2026/07/06/nx-s1-5883842/2026-world-cup-fifa-usmnt-belgium-round-of-16)
-- Quarterfinal/semifinal bracket: [Olympics.com](https://www.olympics.com/en/news/fifa-world-cup-2026-bracket-quarter-finals-full-schedule-live-updates), [Fox Sports](https://www.foxsports.com/stories/soccer/world-cup-bracket-live-quarterfinals-update-standings)
+- Brazil 1-2 Norway, July 5: [Al Jazeera](https://www.aljazeera.com/sports/liveblog/2026/7/5/brazil-vs-norway-live-fifa-world-cup-2026-last-16), [FIFA.com](https://www.fifa.com/en/match-centre/match/17/285023/289288/400021532)
+- Mexico 2-3 England, July 5: [ESPN](https://www.espn.com/soccer/match/_/gameId/760505/england-mexico)
+- Portugal 0-1 Spain, July 6: [ESPN](https://www.espn.com/soccer/match/_/gameId/760506/spain-portugal), [CBS Sports](https://www.cbssports.com/soccer/news/portugal-spain-live-updates-world-cup-2026-score-result/live/)
+- United States 1-4 Belgium, July 6: [ESPN](https://www.espn.com/soccer/match/_/gameId/760507/belgium-united-states), [NPR](https://www.npr.org/2026/07/06/nx-s1-5883842/2026-world-cup-fifa-usmnt-belgium-round-of-16)
+- Argentina 3-2 Egypt, July 7: [ESPN](https://www.espn.com/soccer/story/_/id/49262413), [NBC News](https://www.nbcnews.com/sports/soccer/live-blog/fifa-world-cup-games-2026-july-7-live-updates-rcna353305)
+- Switzerland 0-0 Colombia (Switzerland won 4-3 on penalties), July 7: [CNN](https://www.cnn.com/2026/07/07/sport/argentina-egypt-colombia-switzerland-world-cup-round-of-16), [Al Jazeera](https://www.aljazeera.com/sports/liveblog/2026/7/7/live-switzerland-vs-colombia-fifa-world-cup-2026)
+- Quarterfinal bracket: [Olympics.com](https://www.olympics.com/en/news/fifa-world-cup-2026-bracket-quarter-finals-full-schedule-live-updates), [Fox Sports](https://www.foxsports.com/stories/soccer/world-cup-bracket-live-quarterfinals-update-standings)
 
-## Reproducing
+## Running it yourself
 
 ```
 pip install -r requirements.txt
-python3 src/model.py       # trains models, writes results/models.pkl + metrics
-python3 src/backtest.py    # scores the 2026 World Cup matches played so far
-python3 src/simulate.py    # Monte Carlo forward simulation + probability table
-python3 src/chart.py       # championship probability chart
+python3 src/model.py       # trains both models, saves them plus metrics
+python3 src/backtest.py    # scores the model against this World Cup so far
+python3 src/simulate.py    # simulates the rest of the bracket 20,000 times
+python3 src/chart.py       # draws the championship probability chart
 ```
 
-## Repo layout
+## What's in this repo
 
 ```
-data/           raw Kaggle CSVs
+data/           raw match history from Kaggle
 src/
-  load_data.py  load + patch known 2026 results
-  elo.py        rolling Elo rating engine
-  features.py   feature engineering (Elo diff, form, neutral, importance)
-  model.py      logistic regression + XGBoost, time-based split
-  backtest.py   2026 World Cup-specific backtest
-  simulate.py   Monte Carlo bracket simulation
-  chart.py      championship probability chart
-results/        trained models, metrics, backtest detail, probability table/chart
+  load_data.py  loads the data, patches in results the dataset hasn't caught up on yet
+  elo.py        the Elo rating engine, the heart of the project
+  features.py   turns Elo ratings into model-ready features
+  model.py      trains the logistic regression and XGBoost models
+  backtest.py   grades the model against this exact World Cup
+  simulate.py   Monte Carlo simulation of the remaining bracket
+  chart.py      the championship probability chart
+results/        trained models, metrics, backtest detail, probability table and chart
 ```

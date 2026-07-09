@@ -91,5 +91,7 @@ date,home_team,away_team,home_score,away_score,result,p_A,p_D,p_H,predicted,corr
 2026-07-04,Paraguay,France,0.0,1.0,A,0.70150506,0.16864312,0.12985186,A,True
 2026-07-05,Mexico,England,2.0,3.0,A,0.30120912,0.25365752,0.44513333,H,False
 2026-07-05,Brazil,Norway,1.0,2.0,A,0.25975084,0.2332441,0.5070051,H,False
+2026-07-06,Argentina,Egypt,3.0,2.0,H,0.098924674,0.17573029,0.725345,H,True
+2026-07-06,Switzerland,Colombia,0.0,0.0,D,0.45717666,0.2588953,0.28392807,A,False
 2026-07-06,Portugal,Spain,0.0,1.0,A,0.5260602,0.2342807,0.23965909,A,True
 2026-07-06,United States,Belgium,1.0,4.0,A,0.38145268,0.25228927,0.36625808,A,True

@@ -3,19 +3,26 @@ Load and clean the international match history dataset.
 
 The Kaggle dataset (martj42/international-football-results-from-1872-to-2017,
 despite the name, auto-updates through the present) lags real-world results by
-a day or two. As of 2026-07-07 it was missing final scores for six 2026 World
-Cup Round of 16 matches that have since been confirmed by press coverage, and
-correctly carries the France vs Morocco quarterfinal as an unplayed fixture
-stub. We patch the known results in; two Round of 16 matches (Argentina vs
-Egypt, Switzerland vs Colombia) are genuinely unplayed as of this run and are
-left as NaN scores -- those are exactly the matches this project predicts
-live and grades once real results land.
+a day or two. As of 2026-07-07 it was missing final scores for the entire 2026
+World Cup Round of 16, and correctly carries the France vs Morocco
+quarterfinal as an unplayed fixture stub. We patch the known results in as
+they get confirmed by press coverage.
+
+Penalty shootouts are recorded as the regulation/extra-time draw they actually
+were (0-0, 1-1, etc), matching how the source dataset's own shootouts.csv
+handles this -- goal difference for Elo purposes reflects play, not the
+shootout coin flip. The shootout winner still determines who advances in
+simulate.py.
 
 Sources for patched results (cross-checked across 2+ independent outlets each):
-  Brazil 1-2 Norway        - Al Jazeera, ESPN, FIFA.com (2026-07-05)
-  Mexico 2-3 England       - ESPN, Fox Sports (2026-07-05)
-  Portugal 0-1 Spain       - ESPN, CBS Sports, Olympics.com (2026-07-06)
-  United States 1-4 Belgium - ESPN, NPR, ABC News, FIFA.com (2026-07-06)
+  Brazil 1-2 Norway          - Al Jazeera, ESPN, FIFA.com (2026-07-05)
+  Mexico 2-3 England         - ESPN, Fox Sports (2026-07-05)
+  Portugal 0-1 Spain         - ESPN, CBS Sports, Olympics.com (2026-07-06)
+  United States 1-4 Belgium  - ESPN, NPR, ABC News, FIFA.com (2026-07-06)
+  Argentina 3-2 Egypt        - ESPN, Yahoo Sports, NPR, NBC News (2026-07-07)
+  Switzerland 0-0 Colombia   - ESPN, Al Jazeera, CNN, NBC News, FIFA.com
+                                (2026-07-07); Switzerland won 4-3 on penalties
+                                and advances to the quarterfinals
 """
 import pandas as pd
 
@@ -27,7 +34,16 @@ KNOWN_2026_RESULT_PATCHES = [
     ("2026-07-05", "Mexico", "England", 2, 3),
     ("2026-07-06", "Portugal", "Spain", 0, 1),
     ("2026-07-06", "United States", "Belgium", 1, 4),
+    ("2026-07-06", "Argentina", "Egypt", 3, 2),
+    ("2026-07-06", "Switzerland", "Colombia", 0, 0),  # won 4-3 on penalties
 ]
+
+# Round of 16 matches decided on penalties: (date, home_team, away_team, shootout_winner).
+# Used by simulate.py to determine who actually advances, since the goal-based
+# score above records the level scoreline, not the shootout outcome.
+PENALTY_SHOOTOUT_WINNERS = {
+    ("2026-07-06", "Switzerland", "Colombia"): "Switzerland",
+}
 
 
 def load_results(path: str = RESULTS_CSV) -> pd.DataFrame:

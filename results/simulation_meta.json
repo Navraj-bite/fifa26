@@ -1,16 +1,6 @@
 {
   "n_simulations": 20000,
   "rng_seed": 42,
-  "pending_r16": [
-    [
-      "Argentina",
-      "Egypt"
-    ],
-    [
-      "Switzerland",
-      "Colombia"
-    ]
-  ],
   "confirmed_quarterfinals": [
     [
       "France",
@@ -23,6 +13,10 @@
     [
       "England",
       "Norway"
+    ],
+    [
+      "Argentina",
+      "Switzerland"
     ]
   ]
 }
