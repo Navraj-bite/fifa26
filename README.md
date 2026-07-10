@@ -31,6 +31,19 @@ project once the rest of the quarterfinals wrap up, again after the
 semifinals, and once more after the final, so the numbers keep catching up
 to reality without me manually babysitting it.
 
+## Most likely bracket
+
+If the favorite wins every single remaining match, here's how the rest of
+the tournament plays out:
+
+![Most likely bracket](results/most_likely_bracket.png)
+
+This is a different question than "which team has the best championship
+odds overall" (that's further down, and currently a different team). This
+one just walks the bracket picking the favorite at each stage and follows
+it all the way to the final. See the championship probability section below
+for why the two can point at different teams, it's not a bug.
+
 ## How it actually works
 
 **1. The data.** [This Kaggle dataset](https://www.kaggle.com/datasets/martj42/international-football-results-from-1872-to-2017)
@@ -133,25 +146,17 @@ That's not the model changing its mind, it's just what happens when a team
 locks in a semifinal spot while everyone else still has a coin flip standing
 between them and the final four.
 
-### Most likely bracket
-
-The table above answers "how often does each team win it all, across every
-possible way the tournament could go." That's a different question from "if
-the favorite wins every single remaining match, who's left standing at the
-end." Here's the second one:
-
-![Most likely bracket](results/most_likely_bracket.png)
-
-Worth noticing: this greedy path lands on **Argentina**, not France, even
-though France leads the championship table above. That's not a contradiction,
-it's just what happens when the numbers are close. Spain currently has a
-slight edge over France in a head-to-head matchup (50.9%, mostly because
-Spain's Elo rating is a touch higher), so the greedy bracket has Spain
-knocking France out in the semifinal, then Argentina beating Spain in a final
-that's close enough to be a literal coin flip (50.0%). France still leads
-the championship table because it wins it all across *more total paths*
-through the bracket, even if this one specific path isn't one of them. Both
-views are correct, they're just answering different questions. Full data in
+Worth noticing: the most-likely-bracket diagram up top lands on **Argentina**,
+not France, even though France leads the championship table right above this
+paragraph. That's not a contradiction, it's just what happens when the
+numbers are close. Spain currently has a slight edge over France in a
+head-to-head matchup (50.9%, mostly because Spain's Elo rating is a touch
+higher), so the greedy bracket has Spain knocking France out in the
+semifinal, then Argentina beating Spain in a final that's close enough to be
+a literal coin flip (50.0%). France still leads the championship table
+because it wins it all across *more total paths* through the bracket, even
+if this one specific path isn't one of them. Both views are correct, they're
+just answering different questions. Full data in
 [`results/most_likely_bracket.json`](results/most_likely_bracket.json).
 
 ## The bracket
