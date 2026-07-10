@@ -1,15 +1,14 @@
 {
   "n_simulations": 20000,
   "rng_seed": 42,
-  "confirmed_quarterfinals": [
-    [
-      "France",
-      "Morocco"
-    ],
+  "sf1_slots": [
+    "France",
     [
       "Spain",
       "Belgium"
-    ],
+    ]
+  ],
+  "sf2_slots": [
     [
       "England",
       "Norway"

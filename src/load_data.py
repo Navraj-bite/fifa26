@@ -23,6 +23,9 @@ Sources for patched results (cross-checked across 2+ independent outlets each):
   Switzerland 0-0 Colombia   - ESPN, Al Jazeera, CNN, NBC News, FIFA.com
                                 (2026-07-07); Switzerland won 4-3 on penalties
                                 and advances to the quarterfinals
+  France 2-0 Morocco         - FIFA.com, ESPN, Fox Sports, CNN, NBC News
+                                (2026-07-09); France advances to face the
+                                Spain/Belgium winner in the semifinal
 """
 import pandas as pd
 
@@ -36,6 +39,7 @@ KNOWN_2026_RESULT_PATCHES = [
     ("2026-07-06", "United States", "Belgium", 1, 4),
     ("2026-07-06", "Argentina", "Egypt", 3, 2),
     ("2026-07-06", "Switzerland", "Colombia", 0, 0),  # won 4-3 on penalties
+    ("2026-07-09", "France", "Morocco", 2, 0),
 ]
 
 # Round of 16 matches decided on penalties: (date, home_team, away_team, shootout_winner).

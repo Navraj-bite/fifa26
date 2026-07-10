@@ -10,23 +10,26 @@ First run: July 7, 2026. The final is July 19. This README gets updated as
 real results come in, so you can watch the model get graded live instead of
 taking my word for it.
 
-## Where things stand right now (last updated July 9, 2026)
+## Where things stand right now (last updated July 10, 2026)
 
 The Round of 16 is done. All 16 matches played, including two nail-biters:
 Argentina came back from 2-0 down to beat Egypt 3-2, and Switzerland needed
 penalties to get past Colombia after 120 scoreless minutes.
 
-The quarterfinals are set and none have been played yet:
+The first quarterfinal is also done: **France beat Morocco 2-0** in Boston,
+Mbappé and Dembélé with the goals. France is through to the semifinal in
+Dallas on July 14, where they'll play whoever wins Spain vs Belgium.
 
-- **France vs Morocco**, July 9, Boston
+Three quarterfinals are still to be played:
+
 - **Spain vs Belgium**, July 10, Los Angeles
 - **England vs Norway**, July 11, Miami
 - **Argentina vs Switzerland**, July 11 or 12, Kansas City
 
 Everything below reflects that state. A scheduled job re-runs this whole
-project after the quarterfinals, again after the semifinals, and once more
-after the final, so the numbers keep catching up to reality without me
-manually babysitting it.
+project once the rest of the quarterfinals wrap up, again after the
+semifinals, and once more after the final, so the numbers keep catching up
+to reality without me manually babysitting it.
 
 ## How it actually works
 
@@ -81,12 +84,12 @@ dataset, and guessing randomly among the three outcomes gets you 33.3%. So
 the model is doing real work, just don't expect it to be right every time.
 Football is famously hard to predict, which is most of why it's fun to watch.
 
-### This exact World Cup, 96 matches played (group stage through Round of 16)
+### This exact World Cup, 97 matches played (group stage through the first quarterfinal)
 
 | Model | Accuracy | Log-loss |
 |---|---|---|
-| Logistic regression | 63.5% | 0.854 |
-| XGBoost | **64.6%** | **0.846** |
+| Logistic regression | 63.9% | 0.852 |
+| XGBoost | **64.9%** | **0.844** |
 
 Slightly better than the generic numbers, which is a good sign, not a red
 flag. It means the model isn't just memorizing history, it's picking up on
@@ -95,16 +98,17 @@ tournament. Full match-by-match predictions are in
 [`results/wc2026_backtest_detail.csv`](results/wc2026_backtest_detail.csv) if
 you want to see every call, right and wrong.
 
-Two Round of 16 calls worth calling out honestly: the model correctly picked
+A couple of calls worth flagging honestly: the model correctly picked
 Argentina to beat Egypt, but leaned slightly toward Colombia in a match that
-ended level and went to penalties. Draws are the hardest outcome to call in
-this sport, and this model is no exception.
+ended level and went to penalties. It also correctly called France over
+Morocco, and by a healthy margin (50% vs 24%). Draws are still the hardest
+outcome to predict in this sport, and this model is no exception.
 
 ### Quarterfinal win probabilities
 
-| Match | Model says |
+| Match | Result |
 |---|---|
-| France vs Morocco | France 63.6%, Morocco 36.4% |
+| France vs Morocco | **France won 2-0.** Model had France 63.6% before kickoff. Correct. |
 | Spain vs Belgium | Spain 64.4%, Belgium 35.6% |
 | England vs Norway | England 61.6%, Norway 38.4% |
 | Argentina vs Switzerland | Argentina 72.4%, Switzerland 27.6% |
@@ -115,27 +119,27 @@ this sport, and this model is no exception.
 
 | Team | Reaches semis | Reaches final | Wins it all |
 |---|---|---|---|
-| Argentina | 72.8% | 47.3% | **26.4%** |
-| Spain | 64.7% | 37.3% | 21.2% |
-| France | 63.9% | 33.7% | 18.7% |
-| England | 61.3% | 27.4% | 12.9% |
-| Belgium | 35.3% | 15.0% | 6.3% |
-| Morocco | 36.1% | 14.0% | 5.8% |
-| Norway | 38.7% | 13.6% | 4.7% |
-| Switzerland | 27.2% | 11.7% | 4.1% |
+| France | 100% | 54.4% | **31.1%** |
+| Argentina | 72.6% | 46.9% | 24.9% |
+| Spain | 64.5% | 33.1% | 18.8% |
+| England | 61.8% | 28.0% | 11.8% |
+| Belgium | 35.5% | 12.5% | 5.0% |
+| Norway | 38.2% | 13.7% | 4.8% |
+| Switzerland | 27.4% | 11.4% | 3.6% |
 
 Full numbers in [`results/championship_probabilities.csv`](results/championship_probabilities.csv).
-Argentina is currently the favorite, largely on the strength of their Elo
-rating and a quarterfinal draw against a Switzerland side that's overachieving
-relative to its rating just by being here.
+France jumped to the top of the table simply by winning its quarterfinal.
+That's not the model changing its mind, it's just what happens when a team
+locks in a semifinal spot while everyone else still has a coin flip standing
+between them and the final four.
 
 ## The bracket
 
 ```
-QF1 Boston, Jul 9:     France vs Morocco       -+
-QF2 LA, Jul 10:        Spain vs Belgium        -+- SF1, Dallas, Jul 14 -+
-QF3 Miami, Jul 11:     England vs Norway       -+                      |
-QF4 KC, Jul 11-12:     Argentina vs Switzerland -+- SF2, Atlanta, Jul 15 -+- Final, Jul 19, East Rutherford
+QF1 Boston, Jul 9:     France 2-0 Morocco (FINAL)  -+
+QF2 LA, Jul 10:        Spain vs Belgium            -+- SF1, Dallas, Jul 14 -+
+QF3 Miami, Jul 11:     England vs Norway           -+                      |
+QF4 KC, Jul 11-12:     Argentina vs Switzerland     -+- SF2, Atlanta, Jul 15 -+- Final, Jul 19, East Rutherford
 ```
 
 This gets re-run after the quarterfinals wrap up, again after the
@@ -150,6 +154,7 @@ right or wrong all of this actually was.
 - United States 1-4 Belgium, July 6: [ESPN](https://www.espn.com/soccer/match/_/gameId/760507/belgium-united-states), [NPR](https://www.npr.org/2026/07/06/nx-s1-5883842/2026-world-cup-fifa-usmnt-belgium-round-of-16)
 - Argentina 3-2 Egypt, July 7: [ESPN](https://www.espn.com/soccer/story/_/id/49262413), [NBC News](https://www.nbcnews.com/sports/soccer/live-blog/fifa-world-cup-games-2026-july-7-live-updates-rcna353305)
 - Switzerland 0-0 Colombia (Switzerland won 4-3 on penalties), July 7: [CNN](https://www.cnn.com/2026/07/07/sport/argentina-egypt-colombia-switzerland-world-cup-round-of-16), [Al Jazeera](https://www.aljazeera.com/sports/liveblog/2026/7/7/live-switzerland-vs-colombia-fifa-world-cup-2026)
+- France 2-0 Morocco, July 9: [FIFA.com](https://www.fifa.com/en/match-centre/match/17/285023/289289/400021536), [ESPN](https://www.espn.com/soccer/match/_/gameId/760510/morocco-france), [CNN](https://www.cnn.com/2026/07/09/sport/live-news/france-morocco-world-cup-score)
 - Quarterfinal bracket: [Olympics.com](https://www.olympics.com/en/news/fifa-world-cup-2026-bracket-quarter-finals-full-schedule-live-updates), [Fox Sports](https://www.foxsports.com/stories/soccer/world-cup-bracket-live-quarterfinals-update-standings)
 
 ## Running it yourself

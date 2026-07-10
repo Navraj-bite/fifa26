@@ -3,20 +3,22 @@ Monte Carlo forward simulation of the rest of the 2026 World Cup, using the
 trained model's win probabilities and the confirmed bracket tree.
 
 Bracket confirmed via live web search, cross-checked across ESPN, Fox Sports,
-Olympics.com, Al Jazeera, and CNN. All of the Round of 16 finished on 2026-07-07
-(Switzerland beat Colombia 4-3 on penalties after a 0-0 draw; Argentina beat
-Egypt 3-2). The four quarterfinals below are confirmed matchups, still
-unplayed as of this run:
+FIFA.com, CNN, and NBC News. Status as of this run (2026-07-10):
 
-  QF1 (Boston,  Jul 9):  France     vs Morocco
-  QF2 (LA,      Jul 10): Spain      vs Belgium
-  QF3 (Miami,   Jul 11): England    vs Norway
-  QF4 (KC,      Jul 11/12): Argentina vs Switzerland
+  QF1 (Boston,  Jul 9):  France 2-0 Morocco -- DONE, France advances
+  QF2 (LA,      Jul 10): Spain      vs Belgium     -- pending
+  QF3 (Miami,   Jul 11): England    vs Norway      -- pending
+  QF4 (KC,      Jul 11/12): Argentina vs Switzerland -- pending
 
-  SF1 (Dallas,   Jul 14): Winner QF1 vs Winner QF2
+  SF1 (Dallas,   Jul 14): France vs Winner QF2
   SF2 (Atlanta,  Jul 15): Winner QF3 vs Winner QF4
 
   Final (East Rutherford, Jul 19): Winner SF1 vs Winner SF2
+
+A "slot" below is either a confirmed team name (a string) or a match still to
+be played (a tuple of two team names). Confirmed slots skip straight through;
+pending slots get a coin flip using the model's win probability each
+simulation run.
 
 For a knockout match with no replay, a draw isn't a valid final outcome (it
 goes to extra time/penalties). We convert the model's 3-way (home/draw/away)
@@ -39,12 +41,12 @@ from load_data import load_results, played_mask as pm
 N_SIMULATIONS = 20000
 RNG_SEED = 42
 
-QUARTERFINALS = [
-    ("France", "Morocco"),
-    ("Spain", "Belgium"),
-    ("England", "Norway"),
-    ("Argentina", "Switzerland"),
-]
+SF1_SLOTS = ["France", ("Spain", "Belgium")]
+SF2_SLOTS = [("England", "Norway"), ("Argentina", "Switzerland")]
+
+
+def pending_matches(slots):
+    return [s for s in slots if isinstance(s, tuple)]
 
 
 def win_probability(team_a, team_b, elo, form, model):
@@ -82,20 +84,26 @@ def build_matchup_probabilities(teams, elo, form, model):
     return probs
 
 
-def simulate_bracket(rng, probs, quarterfinals):
-    def play(a, b):
-        return a if rng.random() < probs[(a, b)] else b
+def resolve(rng, probs, slot):
+    if isinstance(slot, str):
+        return slot
+    a, b = slot
+    return a if rng.random() < probs[(a, b)] else b
 
-    qf_winners = [play(a, b) for a, b in quarterfinals]
 
-    sf1 = (qf_winners[0], qf_winners[1])
-    sf2 = (qf_winners[2], qf_winners[3])
-    sf_winners = [play(*sf1), play(*sf2)]
+def simulate_bracket(rng, probs):
+    sf1_teams = [resolve(rng, probs, s) for s in SF1_SLOTS]
+    sf2_teams = [resolve(rng, probs, s) for s in SF2_SLOTS]
+    semifinalists = sf1_teams + sf2_teams
 
-    champion = play(*sf_winners)
+    finalist_1 = resolve(rng, probs, tuple(sf1_teams))
+    finalist_2 = resolve(rng, probs, tuple(sf2_teams))
+    finalists = [finalist_1, finalist_2]
+
+    champion = resolve(rng, probs, tuple(finalists))
     return {
-        "semifinalists": qf_winners,   # reached the semifinal (won their QF)
-        "finalists": sf_winners,       # reached the final (won their SF)
+        "semifinalists": semifinalists,
+        "finalists": finalists,
         "champion": champion,
     }
 
@@ -111,16 +119,24 @@ def main():
         models = pickle.load(f)
     xgb = models["xgb"]
 
-    teams_in_play = set()
-    for a, b in QUARTERFINALS:
-        teams_in_play.add(a)
-        teams_in_play.add(b)
-    remaining_teams = list(teams_in_play)
+    # Every team that could plausibly meet every other team in play (across QF,
+    # SF, and Final matchups) needs a pairwise probability, since who plays whom
+    # in the semifinal and final depends on how the pending quarterfinals resolve.
+    all_teams = set()
+    for slot in SF1_SLOTS + SF2_SLOTS:
+        if isinstance(slot, tuple):
+            all_teams.update(slot)
+        else:
+            all_teams.add(slot)
+    remaining_teams = list(all_teams)
 
-    print("Win probability for the confirmed quarterfinals:")
+    print("Win probability for the confirmed quarterfinals still to be played:")
     probs = build_matchup_probabilities(remaining_teams, elo, form, xgb)
-    for a, b in QUARTERFINALS:
+    for a, b in pending_matches(SF1_SLOTS) + pending_matches(SF2_SLOTS):
         print(f"  {a:12s} vs {b:12s}  ->  {a}: {probs[(a,b)]:.1%}   {b}: {probs[(b,a)]:.1%}")
+    # probs already covers every pair among remaining_teams (built above), which
+    # is what resolve() needs for cross-matchup pairings like France vs whoever
+    # wins Spain/Belgium, since the semifinal opponent isn't fixed in advance.
 
     rng = np.random.default_rng(RNG_SEED)
     champion_counts = defaultdict(int)
@@ -128,7 +144,7 @@ def main():
     semifinalist_counts = defaultdict(int)
 
     for _ in range(N_SIMULATIONS):
-        sim = simulate_bracket(rng, probs, QUARTERFINALS)
+        sim = simulate_bracket(rng, probs)
         champion_counts[sim["champion"]] += 1
         for t in sim["finalists"]:
             finalist_counts[t] += 1
@@ -136,8 +152,8 @@ def main():
             semifinalist_counts[t] += 1
 
     table = []
-    all_teams = set(champion_counts) | set(finalist_counts) | set(semifinalist_counts)
-    for team in all_teams:
+    all_result_teams = set(champion_counts) | set(finalist_counts) | set(semifinalist_counts)
+    for team in all_result_teams:
         table.append({
             "team": team,
             "semifinal_pct": 100 * semifinalist_counts[team] / N_SIMULATIONS,
@@ -154,7 +170,8 @@ def main():
         json.dump({
             "n_simulations": N_SIMULATIONS,
             "rng_seed": RNG_SEED,
-            "confirmed_quarterfinals": QUARTERFINALS,
+            "sf1_slots": [list(s) if isinstance(s, tuple) else s for s in SF1_SLOTS],
+            "sf2_slots": [list(s) if isinstance(s, tuple) else s for s in SF2_SLOTS],
         }, f, indent=2)
     print("\nSaved: results/championship_probabilities.csv, results/simulation_meta.json")
 
