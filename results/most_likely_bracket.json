@@ -1,0 +1,41 @@
+{
+  "quarterfinals": {
+    "France vs Morocco": {
+      "winner": "France",
+      "confidence": 1.0,
+      "status": "confirmed"
+    },
+    "Spain vs Belgium": {
+      "winner": "Spain",
+      "confidence": 0.644,
+      "status": "predicted"
+    },
+    "England vs Norway": {
+      "winner": "England",
+      "confidence": 0.616,
+      "status": "predicted"
+    },
+    "Argentina vs Switzerland": {
+      "winner": "Argentina",
+      "confidence": 0.724,
+      "status": "predicted"
+    }
+  },
+  "semifinals": {
+    "France vs Spain": {
+      "winner": "Spain",
+      "confidence": 0.509
+    },
+    "England vs Argentina": {
+      "winner": "Argentina",
+      "confidence": 0.615
+    }
+  },
+  "final": {
+    "Spain vs Argentina": {
+      "winner": "Argentina",
+      "confidence": 0.5
+    }
+  },
+  "champion": "Argentina"
+}

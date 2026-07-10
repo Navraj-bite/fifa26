@@ -133,6 +133,27 @@ That's not the model changing its mind, it's just what happens when a team
 locks in a semifinal spot while everyone else still has a coin flip standing
 between them and the final four.
 
+### Most likely bracket
+
+The table above answers "how often does each team win it all, across every
+possible way the tournament could go." That's a different question from "if
+the favorite wins every single remaining match, who's left standing at the
+end." Here's the second one:
+
+![Most likely bracket](results/most_likely_bracket.png)
+
+Worth noticing: this greedy path lands on **Argentina**, not France, even
+though France leads the championship table above. That's not a contradiction,
+it's just what happens when the numbers are close. Spain currently has a
+slight edge over France in a head-to-head matchup (50.9%, mostly because
+Spain's Elo rating is a touch higher), so the greedy bracket has Spain
+knocking France out in the semifinal, then Argentina beating Spain in a final
+that's close enough to be a literal coin flip (50.0%). France still leads
+the championship table because it wins it all across *more total paths*
+through the bracket, even if this one specific path isn't one of them. Both
+views are correct, they're just answering different questions. Full data in
+[`results/most_likely_bracket.json`](results/most_likely_bracket.json).
+
 ## The bracket
 
 ```
@@ -165,6 +186,7 @@ python3 src/model.py       # trains both models, saves them plus metrics
 python3 src/backtest.py    # scores the model against this World Cup so far
 python3 src/simulate.py    # simulates the rest of the bracket 20,000 times
 python3 src/chart.py       # draws the championship probability chart
+python3 src/bracket_chart.py  # draws the most-likely-bracket diagram
 ```
 
 ## What's in this repo
@@ -177,7 +199,8 @@ src/
   features.py   turns Elo ratings into model-ready features
   model.py      trains the logistic regression and XGBoost models
   backtest.py   grades the model against this exact World Cup
-  simulate.py   Monte Carlo simulation of the remaining bracket
+  simulate.py   Monte Carlo simulation of the remaining bracket, plus the most-likely-bracket walk
   chart.py      the championship probability chart
-results/        trained models, metrics, backtest detail, probability table and chart
+  bracket_chart.py  the most-likely-bracket diagram
+results/        trained models, metrics, backtest detail, probability tables and charts
 ```

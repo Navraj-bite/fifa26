@@ -91,6 +91,51 @@ def resolve(rng, probs, slot):
     return a if rng.random() < probs[(a, b)] else b
 
 
+def most_likely_winner(probs, slot):
+    """The single favorite for a slot, plus the model's win probability for that pick.
+    A confirmed slot (a string) returns probability 1.0, it already happened."""
+    if isinstance(slot, str):
+        return slot, 1.0
+    a, b = slot
+    return (a, float(probs[(a, b)])) if probs[(a, b)] >= 0.5 else (b, float(probs[(b, a)]))
+
+
+def most_likely_bracket(probs):
+    """Greedily picks the favorite at every stage to build the single most probable
+    bracket outcome. This is a different question than the Monte Carlo table above:
+    that table asks 'how often does each team win it all across every possible
+    branch', this asks 'if the favorite wins every remaining match, who's left
+    standing'. The two can disagree, and often do: a team can lead the marginal
+    championship table by being a strong favorite across many possible paths to
+    the final, while still losing the single specific matchup this greedy walk
+    happens to route them into."""
+    qf2_winner, qf2_conf = most_likely_winner(probs, SF1_SLOTS[1])
+    qf3_winner, qf3_conf = most_likely_winner(probs, SF2_SLOTS[0])
+    qf4_winner, qf4_conf = most_likely_winner(probs, SF2_SLOTS[1])
+
+    sf1_winner, sf1_conf = most_likely_winner(probs, ("France", qf2_winner))
+    sf2_winner, sf2_conf = most_likely_winner(probs, (qf3_winner, qf4_winner))
+
+    champion, final_conf = most_likely_winner(probs, (sf1_winner, sf2_winner))
+
+    return {
+        "quarterfinals": {
+            "France vs Morocco": {"winner": "France", "confidence": 1.0, "status": "confirmed"},
+            "Spain vs Belgium": {"winner": qf2_winner, "confidence": round(qf2_conf, 3), "status": "predicted"},
+            "England vs Norway": {"winner": qf3_winner, "confidence": round(qf3_conf, 3), "status": "predicted"},
+            "Argentina vs Switzerland": {"winner": qf4_winner, "confidence": round(qf4_conf, 3), "status": "predicted"},
+        },
+        "semifinals": {
+            f"France vs {qf2_winner}": {"winner": sf1_winner, "confidence": round(sf1_conf, 3)},
+            f"{qf3_winner} vs {qf4_winner}": {"winner": sf2_winner, "confidence": round(sf2_conf, 3)},
+        },
+        "final": {
+            f"{sf1_winner} vs {sf2_winner}": {"winner": champion, "confidence": round(final_conf, 3)},
+        },
+        "champion": champion,
+    }
+
+
 def simulate_bracket(rng, probs):
     sf1_teams = [resolve(rng, probs, s) for s in SF1_SLOTS]
     sf2_teams = [resolve(rng, probs, s) for s in SF2_SLOTS]
@@ -174,6 +219,15 @@ def main():
             "sf2_slots": [list(s) if isinstance(s, tuple) else s for s in SF2_SLOTS],
         }, f, indent=2)
     print("\nSaved: results/championship_probabilities.csv, results/simulation_meta.json")
+
+    bracket = most_likely_bracket(probs)
+    print(f"\nMost likely bracket (favorite wins every remaining match): {bracket['champion']} takes it all")
+    for stage in ["quarterfinals", "semifinals", "final"]:
+        for match, outcome in bracket[stage].items():
+            print(f"  {match:30s} -> {outcome['winner']:12s} ({outcome['confidence']:.1%})")
+    with open("results/most_likely_bracket.json", "w") as f:
+        json.dump(bracket, f, indent=2)
+    print("Saved: results/most_likely_bracket.json")
 
     return table_df
 
