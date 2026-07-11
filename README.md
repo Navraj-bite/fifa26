@@ -53,7 +53,7 @@ hedging, no maybes, just "if chalk holds, here's your winner." See the
 championship probability section below for why the two questions can point
 at different teams. Right now they happen to agree, which won't last.
 
-## How it actually works
+## The boring stuff (How it works):
 
 **1. The data.** [This Kaggle dataset](https://www.kaggle.com/datasets/martj42/international-football-results-from-1872-to-2017)
 has about 49,500 international football results going back to 1872. It
