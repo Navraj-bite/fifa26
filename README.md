@@ -1,14 +1,15 @@
 # 2026 World Cup Predictor
 
-I built a model that predicts the rest of the 2026 World Cup while the tournament
-is still happening, so the prediction can actually be checked against reality
-instead of quietly forgotten. It uses 154 years of international football
-results to rate every national team, then simulates the remaining bracket
-thousands of times to get a championship probability for each team still alive.
+I built a model that predicts the rest of the 2026 World Cup while the
+tournament is still happening, on purpose, so there's nowhere to hide if it's
+wrong. It uses 154 years of international football results to rate every
+national team, then simulates the remaining bracket thousands of times to get
+a championship probability for each team still alive.
 
 First run: July 7, 2026. The final is July 19. This README gets updated as
 real results come in, so you can watch the model get graded live instead of
-taking my word for it.
+taking my word for it. No quietly editing the predictions after the fact —
+whatever it said before kickoff is what's on the record.
 
 ## Where things stand right now (last updated July 11, 2026)
 
@@ -20,9 +21,13 @@ Two quarterfinals are done. **France beat Morocco 2-0** in Boston, Mbappé and
 Dembélé with the goals. Then **Spain beat Belgium 2-1** in Los Angeles:
 Fabián Ruiz opened the scoring, Charles De Ketelaere equalized for Belgium
 (who played most of the second half without keeper Thibault Courtois after
-an injury), and Mikel Merino scored the winner in the 88th minute off a
-rebound. Spain and France are both through to the semifinal in Dallas on
-July 14 — an all-European clash.
+an injury), and Mikel Merino settled it with an 88th-minute rebound —
+Belgium's night summed up in one stat: down to their backup keeper and out
+of time. Spain and France are both through to the semifinal in Dallas on
+July 14, an all-European clash nobody's underdog-pilled about.
+
+And yes, the model called this one before kickoff: Spain 64.4%, Belgium
+35.6%. Not a coin flip, and not a shock either.
 
 Two quarterfinals are still to be played:
 
@@ -42,10 +47,11 @@ the tournament plays out:
 ![Most likely bracket](results/most_likely_bracket.png)
 
 This is a different question than "which team has the best championship
-odds overall" (that's further down, and currently a different team). This
-one just walks the bracket picking the favorite at each stage and follows
-it all the way to the final. See the championship probability section below
-for why the two can point at different teams, it's not a bug.
+odds overall" (that's further down). This one just walks the bracket picking
+the favorite at each stage and follows it all the way to the final — no
+hedging, no maybes, just "if chalk holds, here's your winner." See the
+championship probability section below for why the two questions can point
+at different teams. Right now they happen to agree, which won't last.
 
 ## How it actually works
 
@@ -60,8 +66,12 @@ against at least two outlets, listed at the bottom of this file.
 spreadsheet, so I built it: replay every match in the dataset in order,
 updating each team's rating after each result the same way chess Elo works,
 adjusted for goal difference and how much the competition matters (a World
-Cup match moves the needle a lot more than a friendly). This is really the
-whole project. Everything downstream just uses these numbers.
+Cup match moves the needle a lot more than a friendly). A match from 1990
+still technically contributes to a team's rating today, but only in the way
+a whisper from three rooms away "contributes" to a conversation — by the
+time you get to 2026, thousands of more recent results have overwritten it.
+This is really the whole project. Everything downstream just uses these
+numbers.
 
 **3. Features.** For each match: both teams' Elo rating going in, the gap
 between them, whether the game is at a neutral venue, how important the
@@ -75,10 +85,12 @@ started. No shuffling. Sports results happen in order, and testing on the
 past using knowledge of the future is how you fool yourself into thinking a
 model works.
 
-**5. The backtest.** This is the part I actually care about. Instead of just
-trusting the generic validation numbers, I ran the trained model against
-every 2026 World Cup match played so far and checked how it actually did.
-No cherry-picking, every match counts, wins and misses both included.
+**5. The backtest.** This is the part I actually care about, and the part
+most sports-model writeups conveniently skip. Instead of just trusting the
+generic validation numbers, I ran the trained model against every 2026 World
+Cup match played so far and checked how it actually did. No cherry-picking,
+every match counts, wins and misses both included, misses printed right
+alongside the wins.
 
 **6. The simulation.** Using the confirmed bracket and the model's win
 probabilities, I simulate the rest of the tournament 20,000 times. Draws in
@@ -87,6 +99,8 @@ flip. Add up how often each team wins it all across those 20,000 runs and
 you get a championship probability table.
 
 ## Results so far
+
+Scoreboard, no spin.
 
 ### Generic validation (games from 2024 to just before this World Cup)
 
@@ -169,7 +183,7 @@ QF4 KC, Jul 11-12:     Argentina vs Switzerland     -+- SF2, Atlanta, Jul 15 -+-
 
 This gets re-run after the quarterfinals wrap up, again after the
 semifinals, and a final time after the July 19 final, when we find out how
-right or wrong all of this actually was.
+right or wrong all of this actually was — in public, with a paper trail.
 
 ## Sources for patched match results
 
