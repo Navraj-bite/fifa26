@@ -26,6 +26,9 @@ Sources for patched results (cross-checked across 2+ independent outlets each):
   France 2-0 Morocco         - FIFA.com, ESPN, Fox Sports, CNN, NBC News
                                 (2026-07-09); France advances to face the
                                 Spain/Belgium winner in the semifinal
+  Spain 2-1 Belgium          - ESPN, Fox Sports, CNN, Al Jazeera (2026-07-10);
+                                Merino's 88th-minute winner sends Spain through
+                                to face France in the semifinal
 """
 import pandas as pd
 
@@ -40,6 +43,7 @@ KNOWN_2026_RESULT_PATCHES = [
     ("2026-07-06", "Argentina", "Egypt", 3, 2),
     ("2026-07-06", "Switzerland", "Colombia", 0, 0),  # won 4-3 on penalties
     ("2026-07-09", "France", "Morocco", 2, 0),
+    ("2026-07-10", "Spain", "Belgium", 2, 1),
 ]
 
 # Round of 16 matches decided on penalties: (date, home_team, away_team, shootout_winner).

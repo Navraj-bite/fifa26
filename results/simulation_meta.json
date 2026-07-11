@@ -3,10 +3,7 @@
   "rng_seed": 42,
   "sf1_slots": [
     "France",
-    [
-      "Spain",
-      "Belgium"
-    ]
+    "Spain"
   ],
   "sf2_slots": [
     [

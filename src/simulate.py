@@ -3,10 +3,10 @@ Monte Carlo forward simulation of the rest of the 2026 World Cup, using the
 trained model's win probabilities and the confirmed bracket tree.
 
 Bracket confirmed via live web search, cross-checked across ESPN, Fox Sports,
-FIFA.com, CNN, and NBC News. Status as of this run (2026-07-10):
+FIFA.com, CNN, and Al Jazeera. Status as of this run (2026-07-11):
 
   QF1 (Boston,  Jul 9):  France 2-0 Morocco -- DONE, France advances
-  QF2 (LA,      Jul 10): Spain      vs Belgium     -- pending
+  QF2 (LA,      Jul 10): Spain 2-1 Belgium  -- DONE, Spain advances
   QF3 (Miami,   Jul 11): England    vs Norway      -- pending
   QF4 (KC,      Jul 11/12): Argentina vs Switzerland -- pending
 
@@ -41,7 +41,7 @@ from load_data import load_results, played_mask as pm
 N_SIMULATIONS = 20000
 RNG_SEED = 42
 
-SF1_SLOTS = ["France", ("Spain", "Belgium")]
+SF1_SLOTS = ["France", "Spain"]
 SF2_SLOTS = [("England", "Norway"), ("Argentina", "Switzerland")]
 
 
@@ -109,11 +109,10 @@ def most_likely_bracket(probs):
     championship table by being a strong favorite across many possible paths to
     the final, while still losing the single specific matchup this greedy walk
     happens to route them into."""
-    qf2_winner, qf2_conf = most_likely_winner(probs, SF1_SLOTS[1])
     qf3_winner, qf3_conf = most_likely_winner(probs, SF2_SLOTS[0])
     qf4_winner, qf4_conf = most_likely_winner(probs, SF2_SLOTS[1])
 
-    sf1_winner, sf1_conf = most_likely_winner(probs, ("France", qf2_winner))
+    sf1_winner, sf1_conf = most_likely_winner(probs, ("France", "Spain"))
     sf2_winner, sf2_conf = most_likely_winner(probs, (qf3_winner, qf4_winner))
 
     champion, final_conf = most_likely_winner(probs, (sf1_winner, sf2_winner))
@@ -121,12 +120,12 @@ def most_likely_bracket(probs):
     return {
         "quarterfinals": {
             "France vs Morocco": {"winner": "France", "confidence": 1.0, "status": "confirmed"},
-            "Spain vs Belgium": {"winner": qf2_winner, "confidence": round(qf2_conf, 3), "status": "predicted"},
+            "Spain vs Belgium": {"winner": "Spain", "confidence": 1.0, "status": "confirmed"},
             "England vs Norway": {"winner": qf3_winner, "confidence": round(qf3_conf, 3), "status": "predicted"},
             "Argentina vs Switzerland": {"winner": qf4_winner, "confidence": round(qf4_conf, 3), "status": "predicted"},
         },
         "semifinals": {
-            f"France vs {qf2_winner}": {"winner": sf1_winner, "confidence": round(sf1_conf, 3)},
+            f"France vs Spain": {"winner": sf1_winner, "confidence": round(sf1_conf, 3)},
             f"{qf3_winner} vs {qf4_winner}": {"winner": sf2_winner, "confidence": round(sf2_conf, 3)},
         },
         "final": {
