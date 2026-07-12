@@ -7,7 +7,7 @@ FIFA.com, CNN, and Al Jazeera. Status as of this run (2026-07-11):
 
   QF1 (Boston,  Jul 9):  France 2-0 Morocco -- DONE, France advances
   QF2 (LA,      Jul 10): Spain 2-1 Belgium  -- DONE, Spain advances
-  QF3 (Miami,   Jul 11): England    vs Norway      -- pending
+  QF3 (Miami,   Jul 11): England 2-1 Norway (aet) -- DONE, England advances
   QF4 (KC,      Jul 11/12): Argentina vs Switzerland -- pending
 
   SF1 (Dallas,   Jul 14): France vs Winner QF2
@@ -42,7 +42,7 @@ N_SIMULATIONS = 20000
 RNG_SEED = 42
 
 SF1_SLOTS = ["France", "Spain"]
-SF2_SLOTS = [("England", "Norway"), ("Argentina", "Switzerland")]
+SF2_SLOTS = ["England", ("Argentina", "Switzerland")]
 
 
 def pending_matches(slots):
@@ -121,7 +121,7 @@ def most_likely_bracket(probs):
         "quarterfinals": {
             "France vs Morocco": {"winner": "France", "confidence": 1.0, "status": "confirmed"},
             "Spain vs Belgium": {"winner": "Spain", "confidence": 1.0, "status": "confirmed"},
-            "England vs Norway": {"winner": qf3_winner, "confidence": round(qf3_conf, 3), "status": "predicted"},
+            "England vs Norway": {"winner": "England", "confidence": 1.0, "status": "confirmed"},
             "Argentina vs Switzerland": {"winner": qf4_winner, "confidence": round(qf4_conf, 3), "status": "predicted"},
         },
         "semifinals": {

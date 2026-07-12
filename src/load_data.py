@@ -29,6 +29,9 @@ Sources for patched results (cross-checked across 2+ independent outlets each):
   Spain 2-1 Belgium          - ESPN, Fox Sports, CNN, Al Jazeera (2026-07-10);
                                 Merino's 88th-minute winner sends Spain through
                                 to face France in the semifinal
+  England 2-1 Norway (aet)   - ESPN, FIFA.com, Al Jazeera, NPR, NBC News
+                                (2026-07-11); Bellingham scores in extra time
+                                to send England through
 """
 import pandas as pd
 
@@ -44,6 +47,7 @@ KNOWN_2026_RESULT_PATCHES = [
     ("2026-07-06", "Switzerland", "Colombia", 0, 0),  # won 4-3 on penalties
     ("2026-07-09", "France", "Morocco", 2, 0),
     ("2026-07-10", "Spain", "Belgium", 2, 1),
+    ("2026-07-11", "England", "Norway", 2, 1),
 ]
 
 # Round of 16 matches decided on penalties: (date, home_team, away_team, shootout_winner).

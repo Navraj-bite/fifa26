@@ -12,29 +12,29 @@
     },
     "England vs Norway": {
       "winner": "England",
-      "confidence": 0.614,
-      "status": "predicted"
+      "confidence": 1.0,
+      "status": "confirmed"
     },
     "Argentina vs Switzerland": {
       "winner": "Argentina",
-      "confidence": 0.72,
+      "confidence": 0.728,
       "status": "predicted"
     }
   },
   "semifinals": {
     "France vs Spain": {
       "winner": "Spain",
-      "confidence": 0.521
+      "confidence": 0.52
     },
     "England vs Argentina": {
       "winner": "Argentina",
-      "confidence": 0.619
+      "confidence": 0.602
     }
   },
   "final": {
     "Spain vs Argentina": {
       "winner": "Spain",
-      "confidence": 0.52
+      "confidence": 0.517
     }
   },
   "champion": "Spain"

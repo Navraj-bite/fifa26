@@ -11,27 +11,25 @@ real results come in, so you can watch the model get graded live instead of
 taking my word for it. No quietly editing the predictions after the fact —
 whatever it said before kickoff is what's on the record.
 
-## Where things stand right now (last updated July 11, 2026)
+## Where things stand right now (last updated July 12, 2026)
 
 The Round of 16 is done. All 16 matches played, including two nail-biters:
 Argentina came back from 2-0 down to beat Egypt 3-2, and Switzerland needed
 penalties to get past Colombia after 120 scoreless minutes.
 
-Two quarterfinals are done. **France beat Morocco 2-0** in Boston, Mbappé and
-Dembélé with the goals. Then **Spain beat Belgium 2-1** in Los Angeles:
-Fabián Ruiz opened the scoring, Charles De Ketelaere equalized for Belgium
-(who played most of the second half without keeper Thibault Courtois after
-an injury), and Mikel Merino settled it with an 88th-minute rebound —
-Belgium's night summed up in one stat: down to their backup keeper and out
-of time. Spain and France are both through to the semifinal in Dallas on
-July 14, an all-European clash nobody's underdog-pilled about.
+Three quarterfinals are done. **France beat Morocco 2-0** in Boston, Mbappé
+and Dembélé with the goals. **Spain beat Belgium 2-1** in Los Angeles, Mikel
+Merino settling it with an 88th-minute rebound. Then **England beat Norway
+2-1 after extra time** in Miami: Andreas Schjelderup put Norway ahead, Jude
+Bellingham equalized before half-time, and Bellingham struck again in the
+third minute of extra time off a rebounded long-range strike to send England
+through. Three of four semifinalists are set: France, Spain, and England.
 
-And yes, the model called this one before kickoff: Spain 64.4%, Belgium
-35.6%. Not a coin flip, and not a shock either.
+The model called all three before kickoff: France 63.6%, Spain 64.4%,
+England 61.4%. No shocks yet.
 
-Two quarterfinals are still to be played:
+One quarterfinal left:
 
-- **England vs Norway**, July 11, Miami
 - **Argentina vs Switzerland**, July 11 or 12, Kansas City
 
 Everything below reflects that state. A scheduled job re-runs this whole
@@ -114,12 +112,12 @@ dataset, and guessing randomly among the three outcomes gets you 33.3%. So
 the model is doing real work, just don't expect it to be right every time.
 Football is famously hard to predict, which is most of why it's fun to watch.
 
-### This exact World Cup, 98 matches played (group stage through both completed quarterfinals)
+### This exact World Cup, 99 matches played (group stage through three completed quarterfinals)
 
 | Model | Accuracy | Log-loss |
 |---|---|---|
-| Logistic regression | 64.3% | 0.849 |
-| XGBoost | **65.3%** | **0.838** |
+| Logistic regression | 64.6% | 0.847 |
+| XGBoost | **65.7%** | **0.840** |
 
 Slightly better than the generic numbers, which is a good sign, not a red
 flag. It means the model isn't just memorizing history, it's picking up on
@@ -131,8 +129,8 @@ you want to see every call, right and wrong.
 A couple of calls worth flagging honestly: the model correctly picked
 Argentina to beat Egypt, but leaned slightly toward Colombia in a match that
 ended level and went to penalties. It also correctly called France over
-Morocco, and Spain over Belgium. Draws are still the hardest outcome to
-predict in this sport, and this model is no exception.
+Morocco, Spain over Belgium, and England over Norway. Draws are still the
+hardest outcome to predict in this sport, and this model is no exception.
 
 ### Quarterfinal win probabilities
 
@@ -140,8 +138,8 @@ predict in this sport, and this model is no exception.
 |---|---|
 | France vs Morocco | **France won 2-0.** Model had France 63.6% before kickoff. Correct. |
 | Spain vs Belgium | **Spain won 2-1.** Model had Spain 64.4% before kickoff. Correct. |
-| England vs Norway | England 61.4%, Norway 38.6% |
-| Argentina vs Switzerland | Argentina 72.0%, Switzerland 28.0% |
+| England vs Norway | **England won 2-1 (aet).** Model had England 61.4% before kickoff. Correct. |
+| Argentina vs Switzerland | Argentina 72.8%, Switzerland 27.2% |
 
 ### Championship probability (20,000 simulated tournaments)
 
@@ -149,27 +147,25 @@ predict in this sport, and this model is no exception.
 
 | Team | Reaches semis | Reaches final | Wins it all |
 |---|---|---|---|
-| Spain | 100% | 52.3% | **30.8%** |
-| France | 100% | 47.7% | 27.7% |
-| Argentina | 71.7% | 46.6% | 23.2% |
-| England | 61.8% | 27.6% | 10.6% |
-| Norway | 38.2% | 13.6% | 4.3% |
-| Switzerland | 28.3% | 12.1% | 3.5% |
+| Spain | 100% | 52.6% | **30.2%** |
+| France | 100% | 47.4% | 26.3% |
+| Argentina | 73.4% | 44.2% | 21.7% |
+| England | 100% | 46.2% | 18.8% |
+| Switzerland | 26.6% | 9.7% | 2.9% |
 
 Full numbers in [`results/championship_probabilities.csv`](results/championship_probabilities.csv).
-Spain edged ahead of France for the top spot the moment its own quarterfinal
-was confirmed, mostly because Spain now has a slight head-to-head edge over
-France (52.1%) in the semifinal both teams are locked into. Belgium drops off
-the table entirely, its 5.0% share of the 20,000 simulated futures just
-evaporates once the coin flip resolves.
+Spain and France barely moved with England's slot locking in — this table
+was already treating England as the likely QF3 winner, so confirming it just
+tightens the numbers rather than reshuffling them. Norway drops off the
+table entirely, its share of the 20,000 simulated futures gone the moment
+the coin flip resolved against it.
 
-The most-likely-bracket diagram up top now agrees with the championship
-table for the first time this tournament: both point to **Spain**. That
-wasn't true a run ago (the greedy bracket had Argentina winning it despite
-France leading the table), and it's a coincidence of this particular set of
-matchups, not a rule — the two questions ("who wins the most total paths"
-vs. "who wins if every favorite wins their next game") can and will diverge
-again as the remaining quarterfinals resolve. Full data in
+The most-likely-bracket diagram up top still agrees with the championship
+table: both point to **Spain**. That's not a rule, just where these
+particular matchups land — the two questions ("who wins the most total
+paths" vs. "who wins if every favorite wins their next game") can and will
+diverge again once Argentina vs Switzerland, the last quarterfinal, is
+decided. Full data in
 [`results/most_likely_bracket.json`](results/most_likely_bracket.json).
 
 ## The bracket
@@ -177,7 +173,7 @@ again as the remaining quarterfinals resolve. Full data in
 ```
 QF1 Boston, Jul 9:     France 2-0 Morocco (FINAL)  -+
 QF2 LA, Jul 10:        Spain 2-1 Belgium (FINAL)   -+- SF1, Dallas, Jul 14 -+
-QF3 Miami, Jul 11:     England vs Norway           -+                      |
+QF3 Miami, Jul 11:     England 2-1 Norway aet (FINAL) -+                    |
 QF4 KC, Jul 11-12:     Argentina vs Switzerland     -+- SF2, Atlanta, Jul 15 -+- Final, Jul 19, East Rutherford
 ```
 
@@ -195,6 +191,7 @@ right or wrong all of this actually was — in public, with a paper trail.
 - Switzerland 0-0 Colombia (Switzerland won 4-3 on penalties), July 7: [CNN](https://www.cnn.com/2026/07/07/sport/argentina-egypt-colombia-switzerland-world-cup-round-of-16), [Al Jazeera](https://www.aljazeera.com/sports/liveblog/2026/7/7/live-switzerland-vs-colombia-fifa-world-cup-2026)
 - France 2-0 Morocco, July 9: [FIFA.com](https://www.fifa.com/en/match-centre/match/17/285023/289289/400021536), [ESPN](https://www.espn.com/soccer/match/_/gameId/760510/morocco-france), [CNN](https://www.cnn.com/2026/07/09/sport/live-news/france-morocco-world-cup-score)
 - Spain 2-1 Belgium, July 10: [ESPN](https://www.espn.com/soccer/match/_/gameId/760511/belgium-spain), [CNN](https://www.cnn.com/2026/07/10/sport/live-news/spain-belgium-world-cup-score), [Al Jazeera](https://www.aljazeera.com/sports/liveblog/2026/7/10/spain-vs-belgium-live-fifa-world-cup-2026-quarterfinal), [Fox Sports](https://www.foxsports.com/soccer/fifa-world-cup-men-spain-vs-belgium-jul-10-2026-game-boxscore-607928)
+- England 2-1 Norway (aet), July 11: [ESPN](https://www.espn.com/soccer/match/_/gameId/760512/england-norway), [FIFA.com](https://www.fifa.com/en/match-centre/match/17/285023/289289/400021539), [Al Jazeera](https://www.aljazeera.com/sports/liveblog/2026/7/11/england-vs-norway-live-fifa-world-cup-2026-quarterfinal), [NPR](https://www.npr.org/2026/07/11/nx-s1-5890169/2026-world-cup-fifa-england-norway-quarterfinal)
 - Quarterfinal bracket: [Olympics.com](https://www.olympics.com/en/news/fifa-world-cup-2026-bracket-quarter-finals-full-schedule-live-updates), [Fox Sports](https://www.foxsports.com/stories/soccer/world-cup-bracket-live-quarterfinals-update-standings)
 
 ## Running it yourself
