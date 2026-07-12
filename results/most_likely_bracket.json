@@ -17,8 +17,8 @@
     },
     "Argentina vs Switzerland": {
       "winner": "Argentina",
-      "confidence": 0.728,
-      "status": "predicted"
+      "confidence": 1.0,
+      "status": "confirmed"
     }
   },
   "semifinals": {
@@ -28,14 +28,14 @@
     },
     "England vs Argentina": {
       "winner": "Argentina",
-      "confidence": 0.602
+      "confidence": 0.62
     }
   },
   "final": {
     "Spain vs Argentina": {
-      "winner": "Spain",
-      "confidence": 0.517
+      "winner": "Argentina",
+      "confidence": 0.51
     }
   },
-  "champion": "Spain"
+  "champion": "Argentina"
 }

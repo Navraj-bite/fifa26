@@ -32,6 +32,12 @@ Sources for patched results (cross-checked across 2+ independent outlets each):
   England 2-1 Norway (aet)   - ESPN, FIFA.com, Al Jazeera, NPR, NBC News
                                 (2026-07-11); Bellingham scores in extra time
                                 to send England through
+  Argentina 3-1 Switzerland  - ESPN, FIFA.com, Al Jazeera, Yahoo Sports
+  (aet)                        (2026-07-11); Alvarez and Lautaro score in
+                                extra time after Ndoye equalized and
+                                Switzerland went down to ten men (Embolo
+                                red card); Argentina advances to face
+                                England in the semifinal
 """
 import pandas as pd
 
@@ -48,6 +54,7 @@ KNOWN_2026_RESULT_PATCHES = [
     ("2026-07-09", "France", "Morocco", 2, 0),
     ("2026-07-10", "Spain", "Belgium", 2, 1),
     ("2026-07-11", "England", "Norway", 2, 1),
+    ("2026-07-11", "Argentina", "Switzerland", 3, 1),
 ]
 
 # Round of 16 matches decided on penalties: (date, home_team, away_team, shootout_winner).

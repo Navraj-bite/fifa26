@@ -8,17 +8,18 @@ FIFA.com, CNN, and Al Jazeera. Status as of this run (2026-07-11):
   QF1 (Boston,  Jul 9):  France 2-0 Morocco -- DONE, France advances
   QF2 (LA,      Jul 10): Spain 2-1 Belgium  -- DONE, Spain advances
   QF3 (Miami,   Jul 11): England 2-1 Norway (aet) -- DONE, England advances
-  QF4 (KC,      Jul 11/12): Argentina vs Switzerland -- pending
+  QF4 (KC,      Jul 11): Argentina 3-1 Switzerland (aet) -- DONE, Argentina advances
 
-  SF1 (Dallas,   Jul 14): France vs Winner QF2
-  SF2 (Atlanta,  Jul 15): Winner QF3 vs Winner QF4
+  SF1 (Dallas,   Jul 14): France vs Spain
+  SF2 (Atlanta,  Jul 15): England vs Argentina
 
   Final (East Rutherford, Jul 19): Winner SF1 vs Winner SF2
 
 A "slot" below is either a confirmed team name (a string) or a match still to
 be played (a tuple of two team names). Confirmed slots skip straight through;
 pending slots get a coin flip using the model's win probability each
-simulation run.
+simulation run. Both semifinal matchups are now confirmed, so the only
+remaining randomness is who wins each actual semifinal and the final.
 
 For a knockout match with no replay, a draw isn't a valid final outcome (it
 goes to extra time/penalties). We convert the model's 3-way (home/draw/away)
@@ -42,7 +43,7 @@ N_SIMULATIONS = 20000
 RNG_SEED = 42
 
 SF1_SLOTS = ["France", "Spain"]
-SF2_SLOTS = ["England", ("Argentina", "Switzerland")]
+SF2_SLOTS = ["England", "Argentina"]
 
 
 def pending_matches(slots):
@@ -122,7 +123,7 @@ def most_likely_bracket(probs):
             "France vs Morocco": {"winner": "France", "confidence": 1.0, "status": "confirmed"},
             "Spain vs Belgium": {"winner": "Spain", "confidence": 1.0, "status": "confirmed"},
             "England vs Norway": {"winner": "England", "confidence": 1.0, "status": "confirmed"},
-            "Argentina vs Switzerland": {"winner": qf4_winner, "confidence": round(qf4_conf, 3), "status": "predicted"},
+            "Argentina vs Switzerland": {"winner": "Argentina", "confidence": 1.0, "status": "confirmed"},
         },
         "semifinals": {
             f"France vs Spain": {"winner": sf1_winner, "confidence": round(sf1_conf, 3)},
