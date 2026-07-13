@@ -184,12 +184,10 @@ back when half the bracket was still uncertain. Full data in
 
 ## The bracket
 
-```
-QF1 Boston, Jul 9:     France 2-0 Morocco (FINAL)  -+
-QF2 LA, Jul 10:        Spain 2-1 Belgium (FINAL)   -+- SF1, Dallas, Jul 14 -+
-QF3 Miami, Jul 11:     England 2-1 Norway aet (FINAL) -+                    |
-QF4 KC, Jul 11:        Argentina 3-1 Switzerland aet (FINAL) -+- SF2, Atlanta, Jul 15 -+- Final, Jul 19, East Rutherford
-```
+![Tournament bracket](results/most_likely_bracket.png)
+
+Quarterfinal results are confirmed; the semifinal and final picks are the
+model's favorites at each stage.
 
 This gets re-run after the quarterfinals wrap up, again after the
 semifinals, and a final time after the July 19 final, when we find out how
