@@ -115,9 +115,11 @@ def main():
     sf1_match = f"{qf1} vs {qf2}"
     sf2_match = f"{qf3} vs {qf4}"
     sf1 = draw_match(ax, SF_X, SF_Y["sf1"], qf1, qf2,
-                      sf[sf1_match]["winner"], sf[sf1_match]["confidence"], "predicted")
+                      sf[sf1_match]["winner"], sf[sf1_match]["confidence"],
+                      sf[sf1_match].get("status", "predicted"))
     sf2 = draw_match(ax, SF_X, SF_Y["sf2"], qf3, qf4,
-                      sf[sf2_match]["winner"], sf[sf2_match]["confidence"], "predicted")
+                      sf[sf2_match]["winner"], sf[sf2_match]["confidence"],
+                      sf[sf2_match].get("status", "predicted"))
 
     connector(ax, SF_X + CARD_W, SF_Y["sf1"], FINAL_X, FINAL_Y)
     connector(ax, SF_X + CARD_W, SF_Y["sf2"], FINAL_X, FINAL_Y)
@@ -125,7 +127,8 @@ def main():
     final = bracket["final"]
     final_match = f"{sf1} vs {sf2}"
     champion = draw_match(ax, FINAL_X, FINAL_Y, sf1, sf2,
-                           final[final_match]["winner"], final[final_match]["confidence"], "predicted")
+                           final[final_match]["winner"], final[final_match]["confidence"],
+                           final[final_match].get("status", "predicted"))
 
     connector(ax, FINAL_X + CARD_W, FINAL_Y, CHAMPION_X, FINAL_Y)
 
