@@ -189,9 +189,9 @@ back when half the bracket was still uncertain. Full data in
 Quarterfinal results are confirmed; the semifinal and final picks are the
 model's favorites at each stage.
 
-This gets re-run after the quarterfinals wrap up, again after the
-semifinals, and a final time after the July 19 final, when we find out how
-right or wrong all of this actually was — in public, with a paper trail.
+This gets re-run after the semifinals wrap up, and a final time after the
+July 19 final, when we find out how right or wrong all of this actually
+was — in public, with a paper trail.
 
 ## Sources for patched match results
 
