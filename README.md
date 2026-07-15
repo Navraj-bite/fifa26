@@ -11,35 +11,28 @@ real results come in, so you can watch the model get graded live instead of
 taking my word for it. No quietly editing the predictions after the fact —
 whatever it said before kickoff is what's on the record.
 
-## Where things stand right now (last updated July 13, 2026)
+## Where things stand right now (last updated July 16, 2026)
 
-The Round of 16 is done. All 16 matches played, including two nail-biters:
-Argentina came back from 2-0 down to beat Egypt 3-2, and Switzerland needed
-penalties to get past Colombia after 120 scoreless minutes.
+The Round of 16 and all four quarterfinals are done, and the model called
+every knockout matchup correctly so far: France 63.6%, Spain 64.4%, England
+61.4%, Argentina 72.8% — four for four in the quarters, chalk holding every
+time even when the underdogs dragged it to extra time.
 
-All four quarterfinals are done, and the semifinals are set. **France beat
-Morocco 2-0** in Boston, Mbappé and Dembélé with the goals. **Spain beat
-Belgium 2-1** in Los Angeles, Mikel Merino settling it with an 88th-minute
-rebound. **England beat Norway 2-1 after extra time** in Miami on a
-Bellingham brace, the winner arriving in the third minute of extra time.
-Then **Argentina beat Switzerland 3-1**, also after extra time: Mac Allister
-headed Argentina in front early, Ndoye equalized for ten-man Switzerland
-(Breel Embolo saw red on the hour), and Julian Álvarez and Lautaro Martínez
-put it away in extra time.
+Now the first semifinal is in the books too. **Spain beat France 2-0** in
+Dallas on Bastille Day — Mikel Oyarzabal from the penalty spot, Pedro Porro
+in the 58th — and Spain is through to the July 19 final in East Rutherford.
+That makes the model **five for five** on knockout calls, and this one was
+its narrowest: it had Spain at just 52.0%, a genuine coin flip that
+happened to land the right way up.
 
-The model called all four before kickoff: France 63.6%, Spain 64.4%, England
-61.4%, Argentina 72.8%. Four for four, no shocks yet — the underdogs kept it
-close, but chalk held every single time.
+One semifinal left:
 
-The semifinal lineup, July 14-15:
-
-- **France vs Spain**, Dallas, July 14
 - **England vs Argentina**, Atlanta, July 15
 
 Everything below reflects that state. A scheduled job re-runs this whole
-project once the semifinals wrap up, and once more after the July 19 final,
-so the numbers keep catching up to reality without me manually babysitting
-it.
+project once the second semifinal wraps up, and once more after the July 19
+final, so the numbers keep catching up to reality without me manually
+babysitting it.
 
 ## Most likely bracket
 
@@ -116,12 +109,12 @@ dataset, and guessing randomly among the three outcomes gets you 33.3%. So
 the model is doing real work, just don't expect it to be right every time.
 Football is famously hard to predict, which is most of why it's fun to watch.
 
-### This exact World Cup, 100 matches played (group stage through all four quarterfinals)
+### This exact World Cup, 101 matches played (group stage through the first semifinal)
 
 | Model | Accuracy | Log-loss |
 |---|---|---|
-| Logistic regression | 65.0% | 0.844 |
-| XGBoost | **66.0%** | **0.838** |
+| Logistic regression | 64.4% | 0.846 |
+| XGBoost | **66.3%** | **0.836** |
 
 Slightly better than the generic numbers, which is a good sign, not a red
 flag. It means the model isn't just memorizing history, it's picking up on
@@ -132,10 +125,10 @@ you want to see every call, right and wrong.
 
 A couple of calls worth flagging honestly: the model correctly picked
 Argentina to beat Egypt, but leaned slightly toward Colombia in a match that
-ended level and went to penalties. Every quarterfinal went the model's way —
-France over Morocco, Spain over Belgium, England over Norway, Argentina over
-Switzerland. Draws are still the hardest outcome to predict in this sport,
-and this model is no exception.
+ended level and went to penalties. Every knockout matchup so far has gone
+the model's way — all four quarterfinals, and now Spain over France in the
+first semifinal. Draws are still the hardest outcome to predict in this
+sport, and this model is no exception.
 
 ### Quarterfinal win probabilities
 
@@ -148,13 +141,14 @@ and this model is no exception.
 
 ### Semifinal win probabilities
 
-| Match | Model says |
+| Match | Result |
 |---|---|
-| France vs Spain | Spain 52.0%, France 48.0% |
-| England vs Argentina | Argentina 62.0%, England 38.0% |
+| France vs Spain | **Spain won 2-0.** Model had Spain 52.0% before kickoff — its narrowest call of the tournament. Correct. |
+| England vs Argentina | Argentina 62.8%, England 37.2% |
 
-France vs Spain is close to a coin flip, England vs Argentina is not. Both
-kick off July 14-15, so these are still predictions, not results.
+The France call deserves an honest asterisk: 52.0% is barely better than
+flipping a coin, so the model gets credit for the pick but not much. The
+England vs Argentina call is a real opinion.
 
 ### Championship probability (20,000 simulated tournaments)
 
@@ -162,36 +156,33 @@ kick off July 14-15, so these are still predictions, not results.
 
 | Team | Reaches semis | Reaches final | Wins it all |
 |---|---|---|---|
-| Argentina | 100% | 62.3% | **32.3%** |
-| Spain | 100% | 52.2% | 27.6% |
-| France | 100% | 47.8% | 24.8% |
-| England | 100% | 37.7% | 15.2% |
+| Spain | 100% | 100% | **56.0%** |
+| Argentina | 100% | 63.1% | 30.1% |
+| England | 100% | 36.9% | 13.9% |
+| France | 100% | 0% | 0% |
 
 Full numbers in [`results/championship_probabilities.csv`](results/championship_probabilities.csv).
-With all four quarterfinals confirmed, this table is now just two coin flips
-deep: win your semifinal, then win the final. Argentina jumped to the top
-mainly on the strength of a 62% edge over England in the semifinal — the
-biggest single-match mismatch left in the bracket. Switzerland's whole 2.9%
-share is gone the moment the final whistle blew in Kansas City.
+Spain vaulted from 27.6% to 56.0% by winning one match — that's what
+booking a guaranteed spot in the final does when everyone else still has a
+semifinal to survive. Argentina remains the most likely opponent (62.8%
+over England), and the model makes the hypothetical Spain vs Argentina
+final almost a pure coin flip: 52.6% Spain. France's 24.8% went to zero at
+the final whistle in Dallas, the cold arithmetic of knockout football.
 
-The most-likely-bracket diagram up top agrees with the championship table
-again: both point to **Argentina**. Both are answering the same question
-right now purely because there's less room left for them to disagree — with
-just four matches standing between here and the trophy, "most total paths"
-and "favorite wins every time" have far fewer ways to diverge than they did
-back when half the bracket was still uncertain. Full data in
+The most-likely-bracket diagram up top still agrees with the championship
+table: both point to **Spain**. Full data in
 [`results/most_likely_bracket.json`](results/most_likely_bracket.json).
 
 ## The bracket
 
 ![Tournament bracket](results/most_likely_bracket.png)
 
-Quarterfinal results are confirmed; the semifinal and final picks are the
-model's favorites at each stage.
+Quarterfinal and first-semifinal results are confirmed; the remaining
+semifinal and final picks are the model's favorites at each stage.
 
-This gets re-run after the semifinals wrap up, and a final time after the
-July 19 final, when we find out how right or wrong all of this actually
-was — in public, with a paper trail.
+This gets re-run after the second semifinal wraps up, and a final time
+after the July 19 final, when we find out how right or wrong all of this
+actually was — in public, with a paper trail.
 
 ## Sources for patched match results
 
@@ -205,6 +196,7 @@ was — in public, with a paper trail.
 - Spain 2-1 Belgium, July 10: [ESPN](https://www.espn.com/soccer/match/_/gameId/760511/belgium-spain), [CNN](https://www.cnn.com/2026/07/10/sport/live-news/spain-belgium-world-cup-score), [Al Jazeera](https://www.aljazeera.com/sports/liveblog/2026/7/10/spain-vs-belgium-live-fifa-world-cup-2026-quarterfinal), [Fox Sports](https://www.foxsports.com/soccer/fifa-world-cup-men-spain-vs-belgium-jul-10-2026-game-boxscore-607928)
 - England 2-1 Norway (aet), July 11: [ESPN](https://www.espn.com/soccer/match/_/gameId/760512/england-norway), [FIFA.com](https://www.fifa.com/en/match-centre/match/17/285023/289289/400021539), [Al Jazeera](https://www.aljazeera.com/sports/liveblog/2026/7/11/england-vs-norway-live-fifa-world-cup-2026-quarterfinal), [NPR](https://www.npr.org/2026/07/11/nx-s1-5890169/2026-world-cup-fifa-england-norway-quarterfinal)
 - Argentina 3-1 Switzerland (aet), July 11: [ESPN](https://www.espn.com/soccer/match/_/gameId/760513/switzerland-argentina), [FIFA.com](https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/argentina-switzerland-match-report-highlights), [Al Jazeera](https://www.aljazeera.com/sports/2026/7/12/argentina-defeat-switzerland-to-set-up-england-semifinal-at-world-cup-2026), [Yahoo Sports](https://sports.yahoo.com/articles/argentina-vs-switzerland-live-score-200002967.html)
+- France 0-2 Spain, July 14: [ESPN](https://www.espn.com/soccer/match/_/gameId/760514/spain-france), [FIFA.com](https://www.fifa.com/en/match-centre/match/17/285023/289290/400021541), [NBC DFW](https://www.nbcdfw.com/news/local/france-takes-on-spain-in-2026-fifa-world-cup-semifinal-at-dallas-stadium-on-bastille-day-excitement-is-building/4048147/)
 - Quarterfinal bracket: [Olympics.com](https://www.olympics.com/en/news/fifa-world-cup-2026-bracket-quarter-finals-full-schedule-live-updates), [Fox Sports](https://www.foxsports.com/stories/soccer/world-cup-bracket-live-quarterfinals-update-standings)
 
 ## Running it yourself

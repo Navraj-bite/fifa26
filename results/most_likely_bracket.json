@@ -24,18 +24,20 @@
   "semifinals": {
     "France vs Spain": {
       "winner": "Spain",
-      "confidence": 0.52
+      "confidence": 1.0,
+      "status": "confirmed"
     },
     "England vs Argentina": {
       "winner": "Argentina",
-      "confidence": 0.62
+      "confidence": 0.628,
+      "status": "predicted"
     }
   },
   "final": {
     "Spain vs Argentina": {
-      "winner": "Argentina",
-      "confidence": 0.51
+      "winner": "Spain",
+      "confidence": 0.526
     }
   },
-  "champion": "Argentina"
+  "champion": "Spain"
 }

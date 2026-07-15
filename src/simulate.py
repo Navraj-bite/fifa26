@@ -10,16 +10,16 @@ FIFA.com, CNN, and Al Jazeera. Status as of this run (2026-07-11):
   QF3 (Miami,   Jul 11): England 2-1 Norway (aet) -- DONE, England advances
   QF4 (KC,      Jul 11): Argentina 3-1 Switzerland (aet) -- DONE, Argentina advances
 
-  SF1 (Dallas,   Jul 14): France vs Spain
-  SF2 (Atlanta,  Jul 15): England vs Argentina
+  SF1 (Dallas,   Jul 14): France 0-2 Spain -- DONE, Spain advances to the final
+  SF2 (Atlanta,  Jul 15): England vs Argentina -- pending
 
-  Final (East Rutherford, Jul 19): Winner SF1 vs Winner SF2
+  Final (East Rutherford, Jul 19): Spain vs Winner SF2
 
 A "slot" below is either a confirmed team name (a string) or a match still to
 be played (a tuple of two team names). Confirmed slots skip straight through;
 pending slots get a coin flip using the model's win probability each
-simulation run. Both semifinal matchups are now confirmed, so the only
-remaining randomness is who wins each actual semifinal and the final.
+simulation run. Spain's spot in the final is locked, so the only remaining
+randomness is the second semifinal and the final itself.
 
 For a knockout match with no replay, a draw isn't a valid final outcome (it
 goes to extra time/penalties). We convert the model's 3-way (home/draw/away)
@@ -42,7 +42,8 @@ from load_data import load_results, played_mask as pm
 N_SIMULATIONS = 20000
 RNG_SEED = 42
 
-SF1_SLOTS = ["France", "Spain"]
+SF1_SLOTS = ["France", "Spain"]  # played Jul 14: Spain won 0-2
+SF1_WINNER = "Spain"
 SF2_SLOTS = ["England", "Argentina"]
 
 
@@ -110,13 +111,9 @@ def most_likely_bracket(probs):
     championship table by being a strong favorite across many possible paths to
     the final, while still losing the single specific matchup this greedy walk
     happens to route them into."""
-    qf3_winner, qf3_conf = most_likely_winner(probs, SF2_SLOTS[0])
-    qf4_winner, qf4_conf = most_likely_winner(probs, SF2_SLOTS[1])
+    sf2_winner, sf2_conf = most_likely_winner(probs, tuple(SF2_SLOTS))
 
-    sf1_winner, sf1_conf = most_likely_winner(probs, ("France", "Spain"))
-    sf2_winner, sf2_conf = most_likely_winner(probs, (qf3_winner, qf4_winner))
-
-    champion, final_conf = most_likely_winner(probs, (sf1_winner, sf2_winner))
+    champion, final_conf = most_likely_winner(probs, (SF1_WINNER, sf2_winner))
 
     return {
         "quarterfinals": {
@@ -126,11 +123,11 @@ def most_likely_bracket(probs):
             "Argentina vs Switzerland": {"winner": "Argentina", "confidence": 1.0, "status": "confirmed"},
         },
         "semifinals": {
-            f"France vs Spain": {"winner": sf1_winner, "confidence": round(sf1_conf, 3)},
-            f"{qf3_winner} vs {qf4_winner}": {"winner": sf2_winner, "confidence": round(sf2_conf, 3)},
+            "France vs Spain": {"winner": SF1_WINNER, "confidence": 1.0, "status": "confirmed"},
+            f"{SF2_SLOTS[0]} vs {SF2_SLOTS[1]}": {"winner": sf2_winner, "confidence": round(sf2_conf, 3), "status": "predicted"},
         },
         "final": {
-            f"{sf1_winner} vs {sf2_winner}": {"winner": champion, "confidence": round(final_conf, 3)},
+            f"{SF1_WINNER} vs {sf2_winner}": {"winner": champion, "confidence": round(final_conf, 3)},
         },
         "champion": champion,
     }
@@ -141,7 +138,7 @@ def simulate_bracket(rng, probs):
     sf2_teams = [resolve(rng, probs, s) for s in SF2_SLOTS]
     semifinalists = sf1_teams + sf2_teams
 
-    finalist_1 = resolve(rng, probs, tuple(sf1_teams))
+    finalist_1 = SF1_WINNER  # France vs Spain already played
     finalist_2 = resolve(rng, probs, tuple(sf2_teams))
     finalists = [finalist_1, finalist_2]
 
@@ -175,9 +172,10 @@ def main():
             all_teams.add(slot)
     remaining_teams = list(all_teams)
 
-    print("Win probability for the confirmed quarterfinals still to be played:")
+    print("Win probability for the matches still to be played:")
     probs = build_matchup_probabilities(remaining_teams, elo, form, xgb)
-    for a, b in pending_matches(SF1_SLOTS) + pending_matches(SF2_SLOTS):
+    remaining = [tuple(SF2_SLOTS)] + [(SF1_WINNER, t) for t in SF2_SLOTS]
+    for a, b in remaining:
         print(f"  {a:12s} vs {b:12s}  ->  {a}: {probs[(a,b)]:.1%}   {b}: {probs[(b,a)]:.1%}")
     # probs already covers every pair among remaining_teams (built above), which
     # is what resolve() needs for cross-matchup pairings like France vs whoever

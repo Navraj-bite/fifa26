@@ -38,6 +38,9 @@ Sources for patched results (cross-checked across 2+ independent outlets each):
                                 Switzerland went down to ten men (Embolo
                                 red card); Argentina advances to face
                                 England in the semifinal
+  France 0-2 Spain           - ESPN, FIFA.com, NBC DFW (2026-07-14);
+                                Oyarzabal penalty and Porro (58') send
+                                Spain to the July 19 final
 """
 import pandas as pd
 
@@ -55,6 +58,7 @@ KNOWN_2026_RESULT_PATCHES = [
     ("2026-07-10", "Spain", "Belgium", 2, 1),
     ("2026-07-11", "England", "Norway", 2, 1),
     ("2026-07-11", "Argentina", "Switzerland", 3, 1),
+    ("2026-07-14", "France", "Spain", 0, 2),
 ]
 
 # Round of 16 matches decided on penalties: (date, home_team, away_team, shootout_winner).
